@@ -972,7 +972,7 @@ The above is the content you need to summarize.`,
       webdavRemotePathTip:
         'Незадължително: Укажете път на папка на WebDAV сървъра (напр. /Documents). Оставете празно за синхронизация от корена.',
       sharepointFolderPathsTip:
-        'Добавете една или повече SharePoint папки за наблюдение. Можете да използвате site-relative paths като "Shared Documents/Policies" или пълни SharePoint URL адреси.',
+        'Незадължително. Добавете една или повече SharePoint папки за наблюдение. Ако оставите празно, обхождането започва от root на сайта. Можете да използвате site-relative paths като "Shared Documents/Policies" или пълни SharePoint URL адреси.',
       google_driveTokenTip:
         'Качете OAuth токен JSON, генериран от OAuth помощника или Google Cloud Console.',
       google_drivePrimaryAdminTip:

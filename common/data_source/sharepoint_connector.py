@@ -109,12 +109,6 @@ class SharePointConnector(LoadConnector, PollConnector):
         if self.sharepoint_client is None:
             raise ConnectorMissingCredentialError("SharePoint")
 
-        normalized_paths = self._get_normalized_folder_paths()
-        if not normalized_paths:
-            raise ConnectorValidationError(
-                "SharePoint requires at least one folder path to monitor."
-            )
-
         try:
             web = self.sharepoint_client.web.get().execute_query()
             self._site_server_relative_url = (
@@ -122,6 +116,7 @@ class SharePointConnector(LoadConnector, PollConnector):
                 or web.properties.get("ServerRelativeUrl")
                 or ""
             )
+            normalized_paths = self._get_normalized_folder_paths()
             for folder_path in normalized_paths:
                 self._get_folder(folder_path)
         except ClientRequestException as exc:
@@ -211,11 +206,6 @@ class SharePointConnector(LoadConnector, PollConnector):
         end: datetime | None,
     ) -> list[SharePointFileEntry]:
         normalized_paths = self._get_normalized_folder_paths()
-        if not normalized_paths:
-            raise ConnectorValidationError(
-                "SharePoint requires at least one folder path to monitor."
-            )
-
         files: list[SharePointFileEntry] = []
         seen_file_ids: set[str] = set()
         for folder_path in normalized_paths:
@@ -327,7 +317,15 @@ class SharePointConnector(LoadConnector, PollConnector):
         )
 
     def _get_normalized_folder_paths(self) -> list[str]:
-        return [self._normalize_folder_path(path) for path in self.folder_paths if path]
+        cleaned_paths = [self._normalize_folder_path(path) for path in self.folder_paths if path]
+        if cleaned_paths:
+            return cleaned_paths
+
+        root_path = self._site_server_relative_url
+        if root_path is None:
+            root_path = urlparse(self.site_url).path or "/"
+        root_path = root_path.rstrip("/") or "/"
+        return [root_path]
 
     def _normalize_folder_path(self, folder_path: str) -> str:
         folder_path = unquote((folder_path or "").strip())
