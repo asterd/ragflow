@@ -28,12 +28,25 @@ class SharePointSyncPlugin(DataSourceSyncPlugin):
         connector.validate_connector_settings()
         self.connector = connector
 
-        if task["reindex"] == "1" or not task["poll_range_start"]:
-            return connector.load_from_state()
+        sync_deleted_files = bool(self.conf.get("sync_deleted_files"))
+        current_files = connector.list_current_files() if sync_deleted_files else None
 
-        return connector.poll_source(
+        if task["reindex"] == "1" or not task["poll_range_start"]:
+            document_batches = connector.load_from_state()
+            return (
+                (document_batches, current_files)
+                if current_files is not None
+                else document_batches
+            )
+
+        document_batches = connector.poll_source(
             task["poll_range_start"].timestamp(),
             datetime.now(timezone.utc).timestamp(),
+        )
+        return (
+            (document_batches, current_files)
+            if current_files is not None
+            else document_batches
         )
 
     def get_source_prefix(self) -> str:
