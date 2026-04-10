@@ -704,7 +704,7 @@ export const DataSourceFormFields = {
       label: 'Folders To Monitor',
       name: 'config.folder_paths',
       type: FormFieldType.Tag,
-      required: true,
+      required: false,
       tooltip: t('setting.sharepointFolderPathsTip'),
     },
     {

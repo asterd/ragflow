@@ -1013,7 +1013,7 @@ Bu otomatik etiketleme özelliği, mevcut datasete alanına özgü bilgi katman�
       webdavRemotePathTip:
         'İsteğe bağlı: WebDAV sunucusunda bir klasör yolu belirtin.',
       sharepointFolderPathsTip:
-        'Izlenecek bir veya daha fazla SharePoint klasoru ekleyin. "Shared Documents/Policies" gibi site-relative yollar veya tam SharePoint URLleri kullanabilirsiniz.',
+        'Istege bagli. Izlenecek bir veya daha fazla SharePoint klasoru ekleyin. Bos birakirsaniz tarama site rootundan baslar. "Shared Documents/Policies" gibi site-relative yollar veya tam SharePoint URLleri kullanabilirsiniz.',
       google_driveTokenTip:
         'OAuth yardımcısından veya Google Cloud Console\'dan oluşturulan OAuth token JSON\'unu yükleyin. "installed" veya "web" uygulamasından bir client_secret JSON da yükleyebilirsiniz. Bu ilk senkronizasyonunuzsa, OAuth onayını tamamlamak için bir tarayıcı penceresi açılacaktır. JSON zaten bir yenileme token\'ı içeriyorsa otomatik olarak yeniden kullanılacaktır.',
       google_drivePrimaryAdminTip:

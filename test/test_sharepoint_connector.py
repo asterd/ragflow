@@ -38,3 +38,13 @@ def test_builtin_sharepoint_plugin_is_registered(monkeypatch):
 
     assert plugin is not None
     assert plugin.get_source_name() == "sharepoint"
+
+
+def test_empty_folder_paths_defaults_to_site_root():
+    connector = SharePointConnector(
+        site_url="https://contoso.sharepoint.com/sites/Knowledge",
+        folder_paths=[],
+    )
+    connector._site_server_relative_url = "/sites/Knowledge"
+
+    assert connector._get_normalized_folder_paths() == ["/sites/Knowledge"]

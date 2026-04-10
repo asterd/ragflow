@@ -43,9 +43,8 @@ class SharePointSyncPlugin(DataSourceSyncPlugin):
         self,
         task: dict[str, Any],
     ) -> tuple[str, str, str] | None:
-        monitored = ", ".join(
-            self._normalize_folder_paths(self.conf.get("folder_paths"))
-        )
+        monitored_paths = self._normalize_folder_paths(self.conf.get("folder_paths"))
+        monitored = ", ".join(monitored_paths) if monitored_paths else "/"
         extra = (
             f"folders={monitored}, batch_size={self.conf.get('batch_size', INDEX_BATCH_SIZE)}"
         )

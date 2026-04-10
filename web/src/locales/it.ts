@@ -844,7 +844,7 @@ Quanto sopra è il contenuto che devi riassumere.`,
       sharepointDescription:
         'Connetti un sito SharePoint con credenziali applicative e monitora una o piu cartelle.',
       sharepointFolderPathsTip:
-        'Aggiungi una o piu cartelle SharePoint da monitorare. Puoi usare percorsi relativi al sito come "Shared Documents/Policies" oppure URL completi di SharePoint.',
+        'Opzionale. Aggiungi una o piu cartelle SharePoint da monitorare. Se lasci vuoto, il crawler parte dalla root del sito. Puoi usare percorsi relativi al sito come "Shared Documents/Policies" oppure URL completi di SharePoint.',
       dingtalkAITableDescription:
         'Connettiti a Dingtalk AI Table e sincronizza i record da una tabella specificata.',
     },
