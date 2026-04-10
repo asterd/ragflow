@@ -7,6 +7,9 @@ ARG NEED_MIRROR=0
 
 WORKDIR /ragflow
 
+# Trust the local Netskope CA during image build.
+COPY nscacert.pem /usr/local/share/ca-certificates/nscacert.crt
+
 # copy models downloaded via download_deps.py
 RUN mkdir -p /ragflow/rag/res/deepdoc /root/.ragflow
 RUN --mount=type=bind,from=infiniflow/ragflow_deps:latest,source=/huggingface.co,target=/huggingface.co \
@@ -34,6 +37,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,id=ragflow_apt,target=/var/cache/apt,sharing=locked \
     apt update && \
     apt --no-install-recommends install -y ca-certificates; \
+    update-ca-certificates; \
     if [ "$NEED_MIRROR" == "1" ]; then \
         sed -i 's|http://archive.ubuntu.com/ubuntu|https://mirrors.aliyun.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources; \
         sed -i 's|http://security.ubuntu.com/ubuntu|https://mirrors.aliyun.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources; \
@@ -43,6 +47,12 @@ RUN --mount=type=cache,id=ragflow_apt,target=/var/cache/apt,sharing=locked \
     chmod 1777 /tmp && \
     apt update && \
     apt install -y build-essential libglib2.0-0 libglx-mesa0 libgl1 pkg-config libicu-dev libgdiplus default-jdk libatk-bridge2.0-0 libpython3-dev libgtk-4-1 libnss3 xdg-utils libgbm-dev libjemalloc-dev gnupg unzip curl wget git vim less ghostscript pandoc texlive fonts-freefont-ttf fonts-noto-cjk postgresql-client
+
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+    REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+    GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt \
+    UV_NATIVE_TLS=1
 
 # Download resource from GitHub to /usr/share/infinity
 RUN mkdir -p /usr/share/infinity/resource && \
@@ -145,6 +155,7 @@ RUN --mount=type=cache,id=ragflow_uv,target=/root/.cache/uv,sharing=locked \
         sed -i 's|pypi.org|mirrors.aliyun.com/pypi|g' uv.lock; \
     else \
         sed -i 's|mirrors.aliyun.com/pypi|pypi.org|g' uv.lock; \
+        sed -i 's|https://gitee.com/infiniflow/|https://github.com/infiniflow/|g' pyproject.toml uv.lock; \
     fi; \
     uv sync --python 3.12 --frozen && \
     # Ensure pip is available in the venv for runtime package installation (fixes #12651)
@@ -153,7 +164,14 @@ RUN --mount=type=cache,id=ragflow_uv,target=/root/.cache/uv,sharing=locked \
 COPY web web
 COPY docs docs
 RUN --mount=type=cache,id=ragflow_npm,target=/root/.npm,sharing=locked \
-    cd web && NODE_OPTIONS="--max-old-space-size=8192" npm install && \
+    cd web && \
+    if [ "$NEED_MIRROR" != "1" ]; then \
+        npm config set cafile /etc/ssl/certs/ca-certificates.crt && \
+        npm config set strict-ssl true && \
+        npm config set registry https://registry.npmjs.org/ && \
+        sed -i 's|https://registry.npmmirror.com/|https://registry.npmjs.org/|g' package-lock.json .npmrc; \
+    fi && \
+    NODE_OPTIONS="--max-old-space-size=8192" npm install && \
     NODE_OPTIONS="--max-old-space-size=8192" VITE_BUILD_SOURCEMAP=false VITE_MINIFY=esbuild npm run build
 
 COPY .git /ragflow/.git

@@ -11,6 +11,7 @@ services:
     environment:
       - node.name=es01
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms1g -Xmx1g}
       - bootstrap.memory_lock=false
       - discovery.type=single-node
       - xpack.security.enabled=true
