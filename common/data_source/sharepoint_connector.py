@@ -145,6 +145,9 @@ class SharePointConnector(LoadConnector, PollConnector):
             datetime.fromtimestamp(end, tz=timezone.utc),
         )
 
+    def list_current_files(self) -> list[SharePointFileEntry]:
+        return self._collect_files(None, None)
+
     def _yield_documents(
         self,
         start: datetime | None,
