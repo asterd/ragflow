@@ -841,6 +841,10 @@ Quanto sopra è il contenuto che devi riassumere.`,
       configuration: 'Configurazione',
       view: 'Visualizza',
       mcp: 'MCP',
+      sharepointDescription:
+        'Connetti un sito SharePoint con credenziali applicative e monitora una o piu cartelle.',
+      sharepointFolderPathsTip:
+        'Aggiungi una o piu cartelle SharePoint da monitorare. Puoi usare percorsi relativi al sito come "Shared Documents/Policies" oppure URL completi di SharePoint.',
       dingtalkAITableDescription:
         'Connettiti a Dingtalk AI Table e sincronizza i record da una tabella specificata.',
     },

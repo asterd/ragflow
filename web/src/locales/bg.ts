@@ -965,10 +965,14 @@ The above is the content you need to summarize.`,
         'Свържете вашия Google Drive чрез OAuth и синхронизирайте конкретни папки или дискове.',
       gmailDescription:
         'Свържете вашия Gmail чрез OAuth за синхронизиране на имейли.',
+      sharepointDescription:
+        'Свържете SharePoint сайт с app credentials и наблюдавайте една или повече папки.',
       webdavDescription:
         'Свържете се с WebDAV сървъри за синхронизиране на файлове.',
       webdavRemotePathTip:
         'Незадължително: Укажете път на папка на WebDAV сървъра (напр. /Documents). Оставете празно за синхронизация от корена.',
+      sharepointFolderPathsTip:
+        'Добавете една или повече SharePoint папки за наблюдение. Можете да използвате site-relative paths като "Shared Documents/Policies" или пълни SharePoint URL адреси.',
       google_driveTokenTip:
         'Качете OAuth токен JSON, генериран от OAuth помощника или Google Cloud Console.',
       google_drivePrimaryAdminTip:

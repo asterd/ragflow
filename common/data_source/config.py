@@ -49,6 +49,7 @@ class DocumentSource(str, Enum):
     SLACK = "slack"
     CONFLUENCE = "confluence"
     JIRA = "jira"
+    SHAREPOINT = "sharepoint"
     GOOGLE_DRIVE = "google_drive"
     GMAIL = "gmail"
     DISCORD = "discord"

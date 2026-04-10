@@ -1023,9 +1023,13 @@ Example: Virtual Hosted Style`,
       google_driveDescription:
         'Connect your Google Drive via OAuth and sync specific folders or drives.',
       gmailDescription: 'Connect your Gmail via OAuth to sync emails.',
+      sharepointDescription:
+        'Connect a SharePoint site with app credentials and monitor one or more folders.',
       webdavDescription: 'Connect to WebDAV servers to sync files.',
       webdavRemotePathTip:
         'Optional: Specify a folder path on the WebDAV server (e.g., /Documents). Leave empty to sync from root.',
+      sharepointFolderPathsTip:
+        'Add one or more SharePoint folders to monitor. You can use site-relative paths such as "Shared Documents/Policies" or full SharePoint URLs.',
       google_driveTokenTip:
         'Upload the OAuth token JSON generated from the OAuth helper or Google Cloud Console. You may also upload a client_secret JSON from an "installed" or "web" application. If this is your first sync, a browser window will open to complete the OAuth consent. If the JSON already contains a refresh token, it will be reused automatically.',
       google_drivePrimaryAdminTip:

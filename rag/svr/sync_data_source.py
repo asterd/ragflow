@@ -70,6 +70,8 @@ from common.data_source.github.connector import GithubConnector
 from common.data_source.gitlab_connector import GitlabConnector
 from common.data_source.bitbucket.connector import BitbucketConnector
 from common.data_source.interfaces import CheckpointOutputWrapper
+from common.data_source.plugin_base import DataSourceSyncPlugin
+from common.data_source.plugin_registry import DATA_SOURCE_PLUGIN_REGISTRY
 from common.log_utils import init_root_logger
 from common.signal_utils import start_tracemalloc_and_snapshot, stop_tracemalloc
 from common.versions import get_ragflow_version
@@ -254,6 +256,32 @@ class SyncBase:
 
     def _get_source_prefix(self):
         return ""
+
+
+class PluginSyncAdapter(SyncBase):
+    plugin_class: type[DataSourceSyncPlugin]
+
+    def __init__(
+        self,
+        conf: dict,
+        plugin_class: type[DataSourceSyncPlugin],
+        source_name: str,
+    ) -> None:
+        super().__init__(conf)
+        self.plugin_class = plugin_class
+        self.SOURCE_NAME = source_name
+        self.plugin = plugin_class(conf)
+
+    async def _generate(self, task: dict):
+        generate_output = await self.plugin.generate(task)
+        connection_info = self.plugin.describe_connection(task)
+        if connection_info:
+            name, details, extra = connection_info
+            self.log_connection(name, details, task, extra)
+        return generate_output
+
+    def _get_source_prefix(self):
+        return self.plugin.get_source_prefix()
 
 
 class _BlobLikeBase(SyncBase):
@@ -758,7 +786,20 @@ class SharePoint(SyncBase):
     SOURCE_NAME: str = FileSource.SHAREPOINT
 
     async def _generate(self, task: dict):
-        pass
+        plugin_class = DATA_SOURCE_PLUGIN_REGISTRY.get_plugin(self.SOURCE_NAME)
+        if plugin_class is None:
+            raise RuntimeError(
+                "No SharePoint ingestion plugin is registered for source 'sharepoint'."
+            )
+
+        adapter = PluginSyncAdapter(self.conf, plugin_class, self.SOURCE_NAME)
+        self.plugin = adapter.plugin
+        return await adapter._generate(task)
+
+    def _get_source_prefix(self):
+        if hasattr(self, "plugin"):
+            return self.plugin.get_source_prefix()
+        return super()._get_source_prefix()
 
 
 class Slack(SyncBase):
@@ -1456,6 +1497,19 @@ func_factory = {
 }
 
 
+def build_sync_handler(task: dict) -> SyncBase:
+    source = task["source"]
+    sync_class = func_factory.get(source)
+    if sync_class is not None:
+        return sync_class(task["config"])
+
+    plugin_class = DATA_SOURCE_PLUGIN_REGISTRY.get_plugin(source)
+    if plugin_class is not None:
+        return PluginSyncAdapter(task["config"], plugin_class, source)
+
+    raise KeyError(f"Unsupported connector source: {source}")
+
+
 async def dispatch_tasks():
     while True:
         try:
@@ -1471,7 +1525,7 @@ async def dispatch_tasks():
             task["poll_range_start"] = task["poll_range_start"].astimezone(timezone.utc)
         if task["poll_range_end"]:
             task["poll_range_end"] = task["poll_range_end"].astimezone(timezone.utc)
-        func = func_factory[task["source"]](task["config"])
+        func = build_sync_handler(task)
         tasks.append(asyncio.create_task(func(task)))
 
     try:
